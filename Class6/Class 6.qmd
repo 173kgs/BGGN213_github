@@ -1,0 +1,171 @@
+---
+title: "Class 6 R functions"
+author: "Wenxi Tang"
+format: pdf
+editor: visual
+---
+
+## Functions in R
+
+In this class we will work through the process of developing your own function for calculating average grades for fictional students in a fictional class.
+
+We are going to start with a simplified version of the problem where I know what the answer should be.
+
+```{r}
+student1 <- c(100, 100, 100, 100, 100, 100, 100, 90)
+student2 <- c(100, NA, 90, 90, 90, 90, 97, 80)
+student3 <- c(90, NA, NA, NA, NA, NA, NA, NA)
+```
+
+To get the average we can use the function `mean()`
+
+```{r}
+mean(student1)
+```
+The `min()` functions will return the lowest value:
+```{r}
+min(student1)
+```
+
+The `which.min()` will tell the index fo the lowest value:
+```{r}
+which.min(student1)
+```
+```{r}
+student1[which.min(student1)]
+```
+
+A `-` before the indexes of the vector will remove that index from the vector. 
+
+```{r}
+mean(student1[-which.min(student1)])
+```
+Student 2:
+```{r}
+student2
+mean(student2[-which.min(student2)])
+```
+
+```{r}
+mean(student2[-which.min(student2)], na.rm = TRUE)
+```
+
+We can maybe use the `is.na()` function to help here but how does it work?
+
+```{r}
+is.na(student2)
+student2[is.na(student2)] <- 0
+student2
+```
+```{r}
+x <- student2
+x[is.na(x)] <- 0
+mean( x[-which.min(x)])
+```
+```{r}
+x <- student3
+x[is.na(x)] <- 0
+mean( x[-which.min(x)])
+```
+
+We now have our working code snapet that can become the body of our function.
+
+Recall that all fucntions in R have at least 3 things:
+
+- name (we pick this)
+- arguments (input to the function)
+- body (where the work gets done)
+
+```{r}
+grade <- function(x) {
+  #Assign NA the value of 0
+  x[is.na(x)] <- 0
+  #Drop lowest value from the vector and calculate the mean
+  mean( x[-which.min(x)])
+}
+```
+
+Let's use this new function `grade()`
+
+```{r}
+grade(student1)
+grade(student2)
+grade(student3)
+```
+
+>Q1. Write a function grade() to determine an overall grade from a vector of student homework assignment scores dropping the lowest single score. If a student misses a homework (i.e. has an NA value) this can be used as a score to be potentially dropped. Your final function should be adquately explained with code comments and be able to work on an example class gradebook such as this one in CSV format: “https://tinyurl.com/gradeinput” [3pts]
+
+To read this CSV file we are going to use `read.csv()`
+
+```{r}
+# read the csv the assign the 1st column as row names. 
+gradebook <- read.csv("https://tinyurl.com/gradeinput", row.names = 1)
+head(gradebook)
+```
+
+We can use the `apply()` function to grade all the students in the gradebook. The `apply()` function will apply any function over the row (MARGIN=1) or columns (MARGIN=2) of any data.frame/matrix etc. 
+
+```{r}
+results <- apply(gradebook, 1 ,grade)
+results
+```
+
+>Q2. Using your grade() function and the supplied gradebook, Who is the top scoring student overall in the gradebook?
+
+```{r}
+results[which.max(results)]
+```
+
+>Q3. From your analysis of the gradebook, which homework was toughest on students (i.e. obtained the lowest scores overall?
+
+We could calculate the mean for the homeworks (i.e. the columns in the gradebook)
+
+```{r}
+#apply the mean function to each column (each homework) and find the min.
+which.min(apply(gradebook, 2, mean, na.rm = TRUE))
+```
+
+We could just take the sum of the cols.
+
+```{r}
+which.min(apply(gradebook, 2, sum, na.rm=T))
+```
+
+I guess we need to mask those NA values to zero. 
+
+```{r}
+mask <- gradebook
+mask[is.na(mask)] <- 0
+mask
+```
+
+We can use `mask` instead of `gradebook` as we will not have NA values to mess us up.
+
+```{r}
+which.min(apply(mask, 2, mean))
+```
+
+>Q4. Optional Extension: From your analysis of the gradebook, which homework was most
+predictive of overall score (i.e. highest correlation with average grade score)?
+
+```{r}
+cor(mask$hw5, results)
+cor(mask$hw2, results)
+cor(mask$hw1, results)
+cor(mask$hw4, results)
+cor(mask$hw3, results)
+```
+
+Can we use the `apply()` function to do this all for us?
+
+```{r}
+cor <- apply(mask, 2, cor, y = results)
+cor
+```
+
+```{r}
+which.max(cor)
+```
+
+Make sure you save your Quarto document and can click the “Render” (or Rmarkdown”
+Knit”) button to generate a PDF format report without errors. Finally, submit your PDF to gradescope.

@@ -1,0 +1,55 @@
+---
+title: "Class 6 Homework Function"
+author: "Wenxi Tang"
+format: pdf
+editor: visual
+---
+
+The provided code that we want to improve and adopt to be more general for any protein-drug combination. 
+
+```{r}
+library(bio3d)
+s1 <- read.pdb("4AKE") # kinase with drug
+s2 <- read.pdb("1AKE") # kinase no drug
+s3 <- read.pdb("1E4Y") # kinase with drug
+
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s3, chain="A", elety="CA")
+
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor")
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+```
+```{r}
+#test run for just one protein
+id <- "4AKE"
+pdb <- read.pdb(id) # kinase with drug
+chainA <- trim.pdb(pdb, chain="A", elety="CA")
+b <- chainA$atom$b
+plotb3(b, sse=chainA, typ="l", ylab="Bfactor")
+```
+
+```{r}
+#function to make a plot when you input a PDB code as 'x'
+plotpdb <- function(x){
+  # read the input PDB file
+  pdb <- read.pdb(x) 
+  #trim down the protein to only chain A
+  chainA <- trim.pdb(pdb, chain="A", elety="CA")
+  #retrieve b-factor values under atom in the chain A and make the b-factor plot
+  plotb3(chainA$atom$b, sse=chainA, typ="l", ylab="Bfactor")
+}
+```
+
+```{r}
+#execute the function `plotpdb` using input of PDB codes, and it will output the b-factor plot accordingly. 
+plotpdb("4AKE")
+plotpdb("1AKE")
+plotpdb("1E4Y")
+```
+
