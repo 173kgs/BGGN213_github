@@ -1,0 +1,374 @@
+---
+title: "Class12"
+author: "Wenxi Tang"
+format: pdf
+editor: visual
+---
+
+In today's class we will use data from a published RNAseq experiment where airway smooth muscle cells were treated with dexamethasone, a synthesic glucocorticoid steroid with anti-inflammatory effects (Himes et al. 2004)
+
+```{r}
+#load the BiocManager and DESeq2 library
+library(BiocManager)
+library(DESeq2)
+```
+
+We will have to download the data. Metadata describes the design of the experiment.
+
+```{r}
+counts <- read.csv("airway_scaledcounts.csv", row.names=1)
+metadata <-  read.csv("airway_metadata.csv")
+```
+
+Let's have a quick look at the start for the counts data:
+
+```{r}
+head(counts)
+```
+
+and the metadata:
+
+```{r}
+metadata
+```
+
+First we need to check that the metadata (a.k.a. "colData") match the order of our samples (i.e. columns) in our counts object.
+
+```{r}
+metadata$id == colnames(counts)
+```
+
+We can use the `all()` function to check if all the inputs are true.
+
+```{r}
+all(metadata$id == colnames(counts))
+```
+
+```{r}
+# ! reverse T to F, F to T. 
+if (!all(metadata$id == colnames(counts))){
+  cat("Wow something is wrong")
+}
+```
+
+We are good to continue
+
+## Start the analysis
+
+```{r}
+metadata
+```
+
+> Q1. How many genes are in this dataset?
+
+```{r}
+nrow(counts)
+```
+
+> Q2. How many 'control' cell lines do we have?
+
+There are 4 control cell lines.
+
+```{r}
+sum(metadata$dex == "control")
+```
+
+First let's extract the control samples
+
+```{r}
+control.id <- metadata[metadata$dex == "control", "id"]
+control.id
+```
+
+> Q3. How would you make the above code in either approach more robust?
+
+We can use the code below instead of the code stated in the lab worksheet.
+
+```{r}
+control.counts <- counts[, control.id]
+head(control.counts)
+```
+
+Let's do the same thing for the treated samples:
+
+```{r}
+treated.id <- metadata[metadata$dex == "treated", "id"]
+treated.id
+```
+
+```{r}
+treated.counts <- counts[, treated.id]
+head(treated.counts)
+```
+
+> Q4. Follow the same procedure for the treated samples (i.e. calculate the mean per gene across drug treated samples and assign to a labeled vector called treated.mean)
+
+```{r}
+#calculate the mean for control and treated data
+control.mean <- rowMeans(control.counts)
+treated.mean <- rowMeans(treated.counts)
+```
+
+To keep us organized let's make a new data.frame with our conrtol and treated means
+
+```{r}
+meancounts <- data.frame(control.mean, treated.mean)
+head(meancounts)
+```
+
+> Q5 (a). Create a scatter plot showing the mean of the treated samples against the mean of the control samples. Your plot should look something like the following.
+
+```{r}
+plot(meancounts)
+```
+
+> Q5 (b).You could also use the ggplot2 package to make this figure producing the plot below. What geom\_?() function would you use for this plot?
+
+```{r}
+library(ggplot2)
+
+ggplot(meancounts) +
+  aes(control.mean, treated.mean) +
+  geom_point()
+```
+
+> Q6. Try plotting both axes on a log scale. What is the argument to plot() that allows you to do this?
+
+We can use the argument `log = xy` to do this. Code below
+
+Hmm, so skewed, let's try a log transform of the control and the treated.
+
+```{r}
+plot(meancounts, log = "xy")
+```
+
+We quite often like to use log2 units. log2FC of 2 is 4X, log2FC of 1 is 2X.
+
+Let's store our log2 Fc values to a new column in `meancounts`.
+
+```{r}
+meancounts$log2fc <- log2(meancounts$treated.mean/meancounts$control.mean)
+head(meancounts)
+```
+
+Can we see how many genes we actually have data for.
+
+```{r}
+head(meancounts[,1:2] == 0)
+```
+
+```{r}
+#get rid of the genes that have 0 expression
+to.keep <- rowSums(meancounts[,1:2] == 0) == 0
+mycounts <- meancounts[to.keep,]
+```
+
+How many genes are "up" at the log2fc threshold of +2
+
+```{r}
+sum(mycounts$log2fc >= +2)
+```
+
+"down"?
+
+```{r}
+sum(mycounts$log2fc <= -2)
+```
+
+> Q7. What is the purpose of the arr.ind argument in the which() function call above? Why would we then take the first column of the output and need to call the unique() function?
+
+arr.ind will let the which() function to return both the row and column indices (i.e. positions) where there are TRUE values, in our case it's where there are 0 values. unique() function makes sure we don't call the same row twice.
+
+> Q8. Using the up.ind vector above can you determine how many up regulated genes we have at the greater than 2 fc level?
+
+```{r}
+up.ind <- mycounts$log2fc >= 2
+down.ind <- mycounts$log2fc <= (-2)
+sum(up.ind)
+```
+
+> Q9. Using the down.ind vector above can you determine how many down regulated genes we have at the greater than 2 fc level?
+
+```{r}
+sum(down.ind)
+```
+
+> Q10. Do you trust these results? Why or why not?
+
+No, because we didn't take variability within the group into account, we didn't consider if there is a statistically significant difference.
+
+# Use DESeq2
+
+```{r}
+#| message: false
+library(DESeq2)
+```
+
+Like most of Bioconductor DESeq wants it's input in a very particular format
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData = counts,
+                              colData = metadata,
+                              design = ~dex)
+```
+
+```{r}
+dds <- DESeq(dds)
+```
+
+```{r}
+res <- results(dds)
+head(res)
+```
+
+Let's make a main summary figure for results to date.
+
+# Volcano plot
+
+```{r}
+plot(res$log2FoldChange, res$padj)
+```
+
+This again screms for a log tranformation
+
+```{r}
+plot(res$log2FoldChange, log(res$padj))
+```
+
+I'm going to flip that y-axis.
+
+```{r}
+plot(res$log2FoldChange, -log(res$padj))
+```
+
+```{r}
+mycols <- rep("grey", nrow(res))
+mycols[res$log2FoldChange >= +2] <- "red"
+mycols[res$log2FoldChange <= -2] <- "blue"
+
+plot(res$log2FoldChange, -log(res$padj), col = mycols, ylab="-Log(P-value)", xlab="Log2(FoldChange)")
+abline(v=c(-2,2), col="darkgray", lty=2)
+abline(h=-log(0.05), col="darkgray", lty=2)
+```
+
+res.df \<-
+
+```{r}
+mycols <- rep("grey", nrow(res))
+mycols[res$log2FoldChange >= +2] <- "red"
+mycols[res$log2FoldChange <= -2] <- "blue"
+  
+ggplot(as.data.frame(res)) +
+  aes(log2FoldChange, -log(padj)) +
+  geom_point() 
+```
+
+# Annotation of the data
+
+```{r}
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+```
+
+I can use the `columns()` to check all available keys
+
+```{r}
+columns(org.Hs.eg.db)
+```
+
+We can use the mapIds() function to add individual columns to our results table. We provide the row names of our results table as a key, and specify that keytype=ENSEMBL. The column argument tells the mapIds() function which information we want, and the multiVals argument tells the function what to do if there are multiple possible values for a single input value. Here we ask to just give us back the first one that occurs in the database.
+
+```{r}
+res$symbol <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",        # The format of our genenames
+                     column="SYMBOL",          # The new format we want to add
+                     multiVals="first")        # Take the first matching object
+
+head(res)
+```
+
+> Q11. Run the mapIds() function two more times to add the Entrez ID and UniProt accession and GENENAME as new columns called res$entrez, res$uniprot and res\$genename.
+
+```{r}
+res$entrez <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",        # The format of our genenames
+                     column="ENTREZID",          # The new format we want to add
+                     multiVals="first")        # Take the first matching object
+```
+
+```{r}
+res$uniprot <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",        # The format of our genenames
+                     column="UNIPROT",          # The new format we want to add
+                     multiVals="first")        # Take the first matching object
+```
+
+```{r}
+res$genename <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",        # The format of our genenames
+                     column="GENENAME",          # The new format we want to add
+                     multiVals="first")        # Take the first matching object
+
+head(res)
+```
+
+```{r}
+#arrange and view the results by the adjusted p-value
+ord <- order( res$padj )
+```
+
+```{r}
+#write out the ordered significant results with annotations
+write.csv(res[ord,], "deseq_results.csv")
+```
+
+# Pathway analysis
+
+My results this far:
+
+```{r}
+#res
+```
+
+I have my log2 fold-changeand p-value aong with my gene names in multiple farmats.
+
+```{r}
+foldchange <- res$log2FoldChange
+names(foldchange) <- res$entrez #add name to a vector
+head(foldchange)
+```
+
+```{r}
+#| message: false
+library(gage)
+library(gageData)
+library(pathview)
+```
+
+```{r}
+data(kegg.sets.hs)
+
+gs <- gage(foldchange, gsets = kegg.sets.hs)
+```
+
+Let's see what is in our output object.
+
+```{r}
+attributes(gs)
+```
+
+```{r}
+head(gs$less)
+```
+
+
+```{r}
+pathview(gene.data = foldchange, pathway.id = "hsa05310")
+```
+
+![](hsa05310.pathview.png)
+
