@@ -1,2 +1,6 @@
 # BGGN213
+<<<<<<< HEAD
 My classwork from BGGN213 at UC San Diego...
+=======
+My classwork from BGGN213 at UC System Down...
+>>>>>>> 875de02c435e07d57e74994c2690afe8d0c92a52
