@@ -1,0 +1,7 @@
+---
+title: "Class17: Vaccination Rate Mini Project"
+author: "Wenxi Tang"
+format: pdf
+editor: visual
+---
+
