@@ -1,7 +1,7 @@
 ---
 title: "Class17: Vaccination Rate Mini Project"
 author: "Wenxi Tang"
-format: pdf
+format: gfm
 editor: visual
 ---
 
@@ -222,14 +222,14 @@ ggplot(thisdate) +
 
 ## Focus on UCSD/La Jolla
 
-UCSD resides in the 92037 zip code area. 
+UCSD resides in the 92037 zip code area.
 
 ```{r}
 ucsd <- filter(sd, zip_code_tabulation_area=="92037")
 ucsd[1,]$age5_plus_population
 ```
 
->Q15. Using ggplot make a graph of the vaccination rate time course for the 92037 ZIP code area:
+> Q15. Using ggplot make a graph of the vaccination rate time course for the 92037 ZIP code area:
 
 ```{r}
 ljplot <- ggplot(ucsd) +
@@ -245,8 +245,7 @@ ljplot
 
 ## Comparing to similar sized areas
 
-Let’s return to the full dataset and look across every zip code area with a population at least as large as that of 92037 on as_of_date “2023-03-07”.
-
+Let's return to the full dataset and look across every zip code area with a population at least as large as that of 92037 on as_of_date "2023-03-07".
 
 ```{r}
 # Subset to all CA areas with a population as large as 92037
@@ -256,8 +255,7 @@ vax.36 <- filter(vax, age5_plus_population > 36144 &
 head(vax.36)
 ```
 
-
->Q16. Calculate the mean “Percent of Population Fully Vaccinated” for ZIP code areas with a population as large as 92037 (La Jolla) as_of_date “2023-02-28”. Add this as a straight horizontal line to your plot from above with the geom_hline() function?
+> Q16. Calculate the mean "Percent of Population Fully Vaccinated" for ZIP code areas with a population as large as 92037 (La Jolla) as_of_date "2023-02-28". Add this as a straight horizontal line to your plot from above with the geom_hline() function?
 
 ```{r}
 n_distinct(vax.36$zip_code_tabulation_area)
@@ -272,14 +270,13 @@ ljplot +
   geom_hline(yintercept = 0.7214936, col = "red", linetype = 5)
 ```
 
->Q17. What is the 6 number summary (Min, 1st Qu., Median, Mean, 3rd Qu., and Max) of the “Percent of Population Fully Vaccinated” values for ZIP code areas with a population as large as 92037 (La Jolla) as_of_date “2023-03-07”?
+> Q17. What is the 6 number summary (Min, 1st Qu., Median, Mean, 3rd Qu., and Max) of the "Percent of Population Fully Vaccinated" values for ZIP code areas with a population as large as 92037 (La Jolla) as_of_date "2023-03-07"?
 
 ```{r}
 summary(vax.36$percent_of_population_fully_vaccinated)
 ```
 
-
->Q18. Using ggplot generate a histogram of this data.
+> Q18. Using ggplot generate a histogram of this data.
 
 ```{r}
 ggplot(vax.36) +
@@ -289,7 +286,7 @@ ggplot(vax.36) +
   geom_vline(xintercept = 0.7215, col = "red", linetype = 5)
 ```
 
->Q19. Is the 92109 and 92040 ZIP code areas above or below the average value you calculated for all these above?
+> Q19. Is the 92109 and 92040 ZIP code areas above or below the average value you calculated for all these above?
 
 ```{r}
 vax %>% filter(as_of_date == "2023-03-07") %>%  
@@ -300,9 +297,10 @@ vax %>% filter(as_of_date == "2023-03-07") %>%
 ```{r}
 filter(vax.36, zip_code_tabulation_area %in% c("92109", "92040"))
 ```
-They are both below 0.7215. 
 
->Q20. Finally make a time course plot of vaccination progress for all areas in the full dataset with a age5_plus_population > 36144.
+They are both below 0.7215.
+
+> Q20. Finally make a time course plot of vaccination progress for all areas in the full dataset with a age5_plus_population \> 36144.
 
 ```{r}
 last <- vax[vax$age5_plus_population > 36144,]
@@ -325,6 +323,6 @@ ggplot(vax.36.all) +
   geom_hline(yintercept = 0.7215, linetype=5)
 ```
 
->Q21. How do you feel about traveling for Spring Break and meeting for in-person class afterwards?
+> Q21. How do you feel about traveling for Spring Break and meeting for in-person class afterwards?
 
-I feel pretty safe because the vaccination rate is pretty high. 
+I feel pretty safe because the vaccination rate is pretty high.
