@@ -5,15 +5,15 @@ My classwork from [BGGN213 Introduction to Bioinformatics](https://bioboot.githu
 
 - Class 04 [Bioinformatics data analysis with R](https://github.com/173kgs/BGGN213_github/blob/main/Class4/BGGN213-class4.pdf)
 
-- Class 05 [Data Viz with ggplot2](https://github.com/173kgs/BGGN213_github/blob/main/BGGN213class5/BGGN213%20Class-5.pdf)
+- Class 05 [Data Viz with ggplot2](https://github.com/173kgs/BGGN213_github/blob/main/BGGN213class5/Class%205.md)
 
-- Class 06 [R functions](https://github.com/173kgs/BGGN213_github/blob/main/Class6/Class-6.pdf)
+- Class 06 [Why, when and how of writing your own R functions ](https://github.com/173kgs/BGGN213_github/blob/main/Class6/Class%206.md)
 
-- Class 07 [Machine Learning 1](https://github.com/173kgs/BGGN213_github/blob/main/Class7_Machine_Learning_1/Class-7-lab.pdf)
+- Class 07 [Machine Learning 1](https://github.com/173kgs/BGGN213_github/blob/main/Class7_Machine_Learning_1/Class%207%20lab.md)
 
-- Class 08 [Unsupervised Learning Mini-Project](https://github.com/173kgs/BGGN213_github/blob/main/Class8_Mini_Project/Class-8.pdf)
+- Class 08 [Unsupervised Learning Mini-Project](https://github.com/173kgs/BGGN213_github/blob/main/Class8_Mini_Project/Class%208.md)
 
-- Class 09 [Structural Bioinformatics](https://github.com/173kgs/BGGN213_github/blob/main/Class9/Class-9.pdf)
+- Class 09 [Structural Bioinformatics](https://github.com/173kgs/BGGN213_github/blob/main/Class9/Class9.md)
 
 - Class 10 [Candy space Principal Component Analysis](https://github.com/173kgs/BGGN213_github/blob/main/Class10_Halloween_MiniProject/Class%2010.md)
 
