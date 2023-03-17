@@ -1,0 +1,194 @@
+---
+title: "Class16"
+author: "Wenxi Tang"
+format: pdf
+editor: visual
+---
+
+
+```{r}
+library(tximport)
+```
+
+
+Setup the folder and filenames to read
+
+```{r}
+folders <- dir(pattern="SRR21568*")
+samples <- sub("_quant", "", folders)
+files <- file.path( folders, "abundance.h5" )
+names(files) <- samples
+```
+
+```{r}
+txi.kallisto <- tximport(files, type = "kallisto", txOut = TRUE)
+```
+
+```{r}
+head(txi.kallisto$counts)
+```
+
+We now have our estimated transcript counts for each sample in R. We can see how many transcripts we have for each sample:
+
+
+```{r}
+colSums(txi.kallisto$counts)
+```
+
+And how many transcripts are detected in at least one sample:
+
+```{r}
+sum(rowSums(txi.kallisto$counts)>0)
+```
+
+Before subsequent analysis, we might want to filter out those annotated transcripts with no reads:
+
+```{r}
+to.keep <- rowSums(txi.kallisto$counts) > 0
+kset.nonzero <- txi.kallisto$counts[to.keep,]
+```
+
+And those with no change over the samples:
+
+```{r}
+keep2 <- apply(kset.nonzero,1,sd)>0
+x <- kset.nonzero[keep2,]
+```
+
+
+```{r}
+pca <- prcomp(t(x), scale=TRUE)
+```
+
+```{r}
+summary(pca)
+```
+
+Now we can use the first two principal components as a co-ordinate system for visualizing the summarized transcriptomic profiles of each sample:
+
+```{r}
+plot(pca$x[,1], pca$x[,2],
+     col=c("blue","blue","red","red"),
+     xlab="PC1", ylab="PC2", pch=16)
+```
+
+>Q. Use ggplot to make a similar figure of PC1 vs PC2 and a seperate figure PC1 vs PC3 and PC2 vs PC3.
+
+```{r}
+library(ggplot2)
+library(ggrepel)
+```
+
+```{r}
+dfpca <- as.data.frame(pca$x)
+```
+
+```{r}
+dfpca
+```
+
+
+```{r}
+ggplot(dfpca) +
+  aes(PC1, PC2) +
+  geom_point(col=c("blue","blue","red","red"))
+```
+
+```{r}
+# Make metadata object for the samples
+colData <- data.frame(condition = factor(rep(c("control", "treatment"), each = 2)))
+rownames(colData) <- colnames(txi.kallisto$counts)
+
+# Make the data.frame for ggplot 
+y <- as.data.frame(pca$x)
+y$Condition <- as.factor(colData$condition)
+
+#plot for PC1 and PC2
+ggplot(y) +
+  aes(PC1, PC2, col=Condition) +
+  geom_point() +
+  geom_text_repel(label=rownames(y)) +
+  theme_bw()
+```
+
+```{r}
+#PC1 and PC3
+ggplot(y) +
+  aes(PC1, PC3, col=Condition) +
+  geom_point() +
+  geom_text_repel(label=rownames(y)) +
+  theme_bw()
+```
+
+```{r}
+#PC2 and PC3
+ggplot(y) +
+  aes(PC2, PC2, col=Condition) +
+  geom_point() +
+  geom_text_repel(label=rownames(y)) +
+  theme_bw()
+```
+
+# Differential expression analysis
+
+```{r}
+library(DESeq2)
+```
+
+```{r}
+dds <- DESeqDataSetFromTximport(txi.kallisto,
+                                colData, 
+                                ~condition)
+```
+
+using counts and average transcript lengths from tximport
+
+```{r}
+dds <- DESeq(dds)
+```
+
+```{r}
+res <- results(dds)
+head(res)
+```
+
+
+# Annotations
+ 
+```{r}
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+```
+
+```{r}
+columns(org.Hs.eg.db)
+```
+
+```{r}
+res$symbol <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBLTRANS", # The format of our genenames
+                     column="SYMBOL", # The new format we want to add
+                     multiVals="first")
+```
+
+# Volcano Plot
+
+```{r}
+# Setup our custom point color vector 
+mycols <- rep("gray", nrow(res))
+mycols[ abs(res$log2FoldChange) > 2 ]  <- "red" 
+
+inds <- (res$padj < 0.01) & (abs(res$log2FoldChange) > 2 )
+mycols[ inds ] <- "blue"
+
+plot( res$log2FoldChange,  -log(res$padj), 
+      col = mycols,
+      xlab="Log2(FoldChange)",
+      ylab="-Log(P-value)")
+# Cut-off lines
+abline(v=c(-2,2), col="gray", lty=2)
+abline(h=-log(0.1), col="gray", lty=2)
+```
+
+
