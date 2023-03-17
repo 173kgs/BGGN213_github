@@ -5,7 +5,9 @@ format: gfm
 editor: visual
 ---
 
+
 ## PDB statistics
+
 
 ```{r}
 #read the csv file
@@ -13,7 +15,9 @@ pdbstats <- read.csv("Data_Export_Summary.csv")
 knitr::kable(pdbstats)
 ```
 
+
 > Q1: What percentage of structures in the PDB are solved by X-Ray and Electron Microscopy.
+
 
 ```{r}
 #use `gsub` to remove comma in the dataset and read it as numbers
@@ -40,11 +44,14 @@ char2numsum(pdbstats$X.ray)/char2numsum(pdbstats$Total)
 char2numsum(pdbstats$EM)/char2numsum(pdbstats$Total)
 ```
 
+
 > Q2: What proportion of structures in the PDB are protein?
+
 
 ```{r}
 char2numsum(pdbstats$Total[1])/char2numsum(pdbstats$Total)
 ```
+
 
 > Q3: Type HIV in the PDB website search box on the home page and determine how many HIV-1 protease structures are in the current PDB?
 
@@ -72,6 +79,7 @@ Figure shown above.
 
 We are going to use the `bio3d` package for structural bioinformatics.
 
+
 ```{r}
 library(bio3d)
 
@@ -79,11 +87,14 @@ p <- read.pdb("1hsg")
 p
 ```
 
+
 > Q7: How many amino acid residues are there in this pdb object?
+
 
 ```{r}
 length(p$seqres)
 ```
+
 
 > Q8: Name one of the two non-protein residues?
 
@@ -93,11 +104,14 @@ MK1 - the ligand.
 
 There are 2 chains, A and B.
 
+
 ```{r}
 head(p$atom)
 ```
 
+
 > Q. What is the resid for the first atom?
+
 
 ```{r}
 #two ways to do it
@@ -109,7 +123,9 @@ p$atom$resid[1]
 aa321(p$atom$resid[1])
 ```
 
+
 Let's do a Normal Mode Analysis (NMA)
+
 
 ```{r}
 #read an input structure "6s36"
@@ -117,7 +133,9 @@ adk <- read.pdb("6s36")
 adk
 ```
 
+
 Now for our nma
+
 
 ```{r}
 #Do the NMA
@@ -125,27 +143,33 @@ m <- nma(adk)
 plot(m)
 ```
 
+
 Make a viz of this motion for Molstar
+
 
 ```{r}
 #Make a trajectory file
 mktrj(m, file="adk_m7.pdb")
 ```
 
+
 # Now for comparative analysis of protein structure
 
 First we will extract the seq from a protein we are interested in.
+
 
 ```{r}
 aa <- get.seq("1ake_A")
 aa
 ```
 
+
 > Q13. How many amino acids are in this sequence, i.e. how long is this sequence?
 
 214 AAs are in this sequence.
 
 Now search against the PDB database for related structures.
+
 
 ```{r}
 b <- blast.pdb(aa)
@@ -164,27 +188,35 @@ hits
 hits$pdb.id
 ```
 
+
 Now we will download all these structures
+
 
 ```{r}
 #DOWNLOAD RELATED PDB FILES
 files <- get.pdb(hits$pdb.id, path="pdbs", split=T, gzip = T)
 ```
 
+
 ## Align and superpose (i.e. fit on top of each other)
+
 
 ```{r}
 # Align related PDBs
 pdbs <- pdbaln(files, fit = TRUE, exefile="msa")
 ```
 
+
 And let's see the output
+
 
 ```{r}
 pdbs
 ```
 
+
 Now for the PCA
+
 
 ```{r}
 # Perform PCA
@@ -203,12 +235,15 @@ grps.rd <- cutree(hc.rd, k=3)
 plot(pc.xray, 1:2, col="grey50", bg=grps.rd, pch=21, cex=1)
 ```
 
+
 and make a trajectory of the displacement captured by PCA
+
 
 ```{r}
 # Visualize first principal component
 pc1 <- mktrj(pc.xray, pc=1, file="pc_1.pdb")
 ```
+
 
 > Q10. Which of the packages above is found only on BioConductor and not CRAN?
 
@@ -222,6 +257,7 @@ pc1 <- mktrj(pc.xray, pc=1, file="pc_1.pdb")
 
 True
 
+
 ```{r}
 # NMA of all structures
 modes <- nma(pdbs)
@@ -231,6 +267,8 @@ modes <- nma(pdbs)
 plot(modes, pdbs, col=grps.rd)
 ```
 
+
 > Q14. What do you note about this plot? Are the black and colored lines similar or different? Where do you think they differ most and why?
 
 There are 3 major groups of structures with different motion capability. The black and colored lines are different regarding to their fluctuation capability. The most different part if around residue 50 and residue 130\~150 where the colored ones are most fluctuated while the black ones are less fluctuated. It's because the the presence of the ligand affect its flexibility.
+
