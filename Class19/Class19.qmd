@@ -1,7 +1,7 @@
 ---
 title: "Class19"
 author: "Wenxi Tang"
-format: pdf
+format: gfm
 editor: visual
 ---
 
@@ -9,7 +9,7 @@ editor: visual
 
 Here I extract the CDC figures for Pertussis cases in USA: https://www.cdc.gov/pertussis/surv-reporting/cases-by-year.html
 
->Q1. With the help of the R “addin” package datapasta assign the CDC pertussis case number data to a data frame called cdc and use ggplot to make a plot of cases numbers over time.
+> Q1. With the help of the R "addin" package datapasta assign the CDC pertussis case number data to a data frame called cdc and use ggplot to make a plot of cases numbers over time.
 
 ```{r echo=FALSE}
 cdc <- data.frame(
@@ -53,16 +53,15 @@ cdc <- data.frame(
        )
 ```
 
-
-Let's make a plot of number of Pertussis cases per year. 
+Let's make a plot of number of Pertussis cases per year.
 
 ```{r}
 library(ggplot2)
 ```
 
->Q2. Using the ggplot geom_vline() function add lines to your previous plot for the 1946 introduction of the wP vaccine and the 1996 switch to aP vaccine (see example in the hint below). What do you notice?
+> Q2. Using the ggplot geom_vline() function add lines to your previous plot for the 1946 introduction of the wP vaccine and the 1996 switch to aP vaccine (see example in the hint below). What do you notice?
 
-The vaccine effectively brought down number of cases. The fluctuation in number of cases may reflect vaccine hesitancy, vaccine side-effects. The newly introduced aP vaccine seems not as effective as the wP vaccines as after the new vaccine was introduced, the number of cases started to fluctuate again. 
+The vaccine effectively brought down number of cases. The fluctuation in number of cases may reflect vaccine hesitancy, vaccine side-effects. The newly introduced aP vaccine seems not as effective as the wP vaccines as after the new vaccine was introduced, the number of cases started to fluctuate again.
 
 ```{r}
 base <- ggplot(cdc) + aes(Year, Cases) +
@@ -73,10 +72,9 @@ base <- ggplot(cdc) + aes(Year, Cases) +
 base
 ```
 
-The first vaccine (so called wP) was introduce in the USA in 1946. Let's add this as a line to our plot. 
+The first vaccine (so called wP) was introduce in the USA in 1946. Let's add this as a line to our plot.
 
-The US, and many other countries, switched from the original wP vaccine to a new aP vaccine (acellular) in 1996. Let's add this line to our plot. 
-
+The US, and many other countries, switched from the original wP vaccine to a new aP vaccine (acellular) in 1996. Let's add this line to our plot.
 
 ```{r}
 #add lines for introduction for vaccines. 
@@ -85,7 +83,7 @@ base +
   geom_vline(xintercept = 1996, linetype = 5, col = "red")
 ```
 
->Q3. Describe what happened after the introduction of the aP vaccine? Do you have a possible explanation for the observed trend?
+> Q3. Describe what happened after the introduction of the aP vaccine? Do you have a possible explanation for the observed trend?
 
 The number of cases started to fluctuate and increase a bit before it was introduced. Probably the aP vaccine is less effective compared to the wP vaccine and requires a booster after a while (explains why the first a few years were still pretty stable). Or it might be the waning of immunity in adolescents originally primed as infants with the newer aP vaccine as compared to the older wP vaccine.
 
@@ -102,26 +100,25 @@ head(subject)
 dim(subject)
 ```
 
->Q4. How many aP and wP infancy vaccinated subjects are in the dataset?
+> Q4. How many aP and wP infancy vaccinated subjects are in the dataset?
 
 ```{r}
 table(subject$infancy_vac)
 ```
 
->Q5. How many Male and Female subjects/patients are in the dataset?
+> Q5. How many Male and Female subjects/patients are in the dataset?
 
 ```{r}
 table(subject$biological_sex)
 ```
 
-
->Q6. What is the breakdown of race and biological sex (e.g. number of Asian females, White males etc…)?
+> Q6. What is the breakdown of race and biological sex (e.g. number of Asian females, White males etc...)?
 
 ```{r}
 table(subject$race, subject$biological_sex)
 ```
 
-Let's look at the specimen table next: 
+Let's look at the specimen table next:
 
 ```{r}
 specimen <- read_json("http://cmi-pb.org/api/specimen", simplifyVector = TRUE)
@@ -129,9 +126,9 @@ head(specimen)
 dim(specimen)
 ```
 
-To know whether a given specimen_id comes from an aP or wP individual we need to link (a.k.a. “join” or merge) our specimen and subject data frames. The excellent dplyr package (that we have used previously) has a family of join() functions that can help us with this common task:
+To know whether a given specimen_id comes from an aP or wP individual we need to link (a.k.a. "join" or merge) our specimen and subject data frames. The excellent dplyr package (that we have used previously) has a family of join() functions that can help us with this common task:
 
->Q9. Complete the code to join specimen and subject tables to make a new merged data frame containing all specimen records along with their associated subject details:
+> Q9. Complete the code to join specimen and subject tables to make a new merged data frame containing all specimen records along with their associated subject details:
 
 ```{r}
 library(dplyr)
@@ -140,7 +137,7 @@ dim(meta)
 head(meta)
 ```
 
->Q10. Now using the same procedure join meta with titer data so we can further analyze this data in terms of time of visit aP/wP, male/female etc.
+> Q10. Now using the same procedure join meta with titer data so we can further analyze this data in terms of time of visit aP/wP, male/female etc.
 
 ```{r}
 #read the titer dataset
@@ -152,28 +149,25 @@ dim(abdata)
 head(abdata)
 ```
 
-> Q. What do you notice about the "visit" number 8? 
+> Q. What do you notice about the "visit" number 8?
 
-It's only 80 compared to others which are all a few thousands. 
+It's only 80 compared to others which are all a few thousands.
 
 ```{r}
 table(abdata$visit)
 ```
 
+> Q. How many isotypes do we have in this dataset?
 
->Q. How many isotypes do we have in this dataset?
-
-
->Q11. How many specimens (i.e. entries in abdata) do we have for each isotype?
+> Q11. How many specimens (i.e. entries in abdata) do we have for each isotype?
 
 ```{r}
 table(titer$isotype)
 ```
 
->Q12. What do you notice about the number of visit 8 specimens compared to other visits?
+> Q12. What do you notice about the number of visit 8 specimens compared to other visits?
 
 # Examine IgG1 Ab titer levels
-
 
 ```{r}
 #filter only the igg1 data
@@ -182,13 +176,13 @@ head(ig1)
 dim(ig1)
 ```
 
->Q. How many antigens are there?
+> Q. How many antigens are there?
 
 ```{r}
 table(ig1$antigen)
 ```
 
-Analysis of the whole dataset: antigen levels - i.e. a plot of antigen vs MFI. 
+Analysis of the whole dataset: antigen levels - i.e. a plot of antigen vs MFI.
 
 ```{r}
 ggplot(ig1) +
@@ -198,9 +192,9 @@ ggplot(ig1) +
   theme_bw()
 ```
 
->Q14. What antigens show differences in the level of IgG1 antibody titers recognizing them over time? Why these and not others?
+> Q14. What antigens show differences in the level of IgG1 antibody titers recognizing them over time? Why these and not others?
 
-The FIM2/3, TT, PRN increases along with visits. Probably because these antigens are extracellular and easily recognized by antibodies. 
+The FIM2/3, TT, PRN increases along with visits. Probably because these antigens are extracellular and easily recognized by antibodies.
 
 ```{r}
 ggplot(ig1) +
@@ -211,8 +205,7 @@ ggplot(ig1) +
   theme(axis.text.x = element_text(angle = 45, hjust=1))
 ```
 
-
-> Q15. Filter to pull out only two specific antigens for analysis and create a boxplot for each. You can chose any you like. Below I picked a “control” antigen (“Measles”, that is not in our vaccines) and a clear antigen of interest (“FIM2/3”, extra-cellular fimbriae proteins from B. pertussis that participate in substrate attachment).
+> Q15. Filter to pull out only two specific antigens for analysis and create a boxplot for each. You can chose any you like. Below I picked a "control" antigen ("Measles", that is not in our vaccines) and a clear antigen of interest ("FIM2/3", extra-cellular fimbriae proteins from B. pertussis that participate in substrate attachment).
 
 ```{r}
 #MEASLE ANTIGEN LEVELS
@@ -223,6 +216,7 @@ filter(ig1, antigen=="Measles") %>%
   facet_wrap(vars(visit)) +
   theme_bw()
 ```
+
 ```{r}
 #FIM2/3 ANTIGEN LEVEL
 filter(ig1, antigen=="FIM2/3") %>%
@@ -243,14 +237,13 @@ filter(ig1, antigen=="PT") %>%
   theme_bw()
 ```
 
+> Q16. What do you notice about these two antigens time courses and the FIM2/3 data in particular?
 
->Q16. What do you notice about these two antigens time courses and the FIM2/3 data in particular?
+The level of FIM2/3 and PT shows an increasing trend and shows a peak around 4th\~6th visits. Definitely an obvious increase compared to the measles control.
 
-The level of FIM2/3 and PT shows an increasing trend and shows a peak around 4th~6th visits. Definitely an obvious increase compared to the measles control. 
+> Q17. Do you see any clear difference in aP vs. wP responses?
 
->Q17. Do you see any clear difference in aP vs. wP responses?
-
-They show similar increasing trends along with visits. No clear differences. 
+They show similar increasing trends along with visits. No clear differences.
 
 # Obtaining CMI-PB RNASeq data
 
@@ -262,14 +255,14 @@ rna <- read_json(url, simplifyVector = TRUE)
 head(rna)
 ```
 
-To facilitate further analysis we need to “join” the rna expression data with our metadata meta, which is itself a join of sample and specimen data. This will allow us to look at this genes TPM expression values over aP/wP status and at different visits (i.e. times):
+To facilitate further analysis we need to "join" the rna expression data with our metadata meta, which is itself a join of sample and specimen data. This will allow us to look at this genes TPM expression values over aP/wP status and at different visits (i.e. times):
 
 ```{r}
 ssrna <- inner_join(rna, meta)
 dim(ssrna)
 ```
 
->Q18. Make a plot of the time course of gene expression for IGHG1 gene (i.e. a plot of visit vs. tpm).
+> Q18. Make a plot of the time course of gene expression for IGHG1 gene (i.e. a plot of visit vs. tpm).
 
 ```{r}
 ggplot(ssrna) +
@@ -278,12 +271,11 @@ ggplot(ssrna) +
   geom_line(alpha=0.2)
 ```
 
+> Q19.: What do you notice about the expression of this gene (i.e. when is it at it's maximum level)?
 
->Q19.: What do you notice about the expression of this gene (i.e. when is it at it’s maximum level)?
+It has a maximum level at the 4th visit and starts to drop on the 5th visit.
 
-It has a maximum level at the 4th visit and starts to drop on the 5th visit. 
-
->Q20. Does this pattern in time match the trend of antibody titer data? If not, why not?
+> Q20. Does this pattern in time match the trend of antibody titer data? If not, why not?
 
 The expression peak is earlier than the antibody peak, which is around the 5th visit. And the antibody titer stays longer. This makes sense because we need the expression, protein production is followed and it can stay for a while.
 
@@ -306,12 +298,10 @@ ssrna %>%
     geom_rug() 
 ```
 
->Q. Is RNA-Seq expression levels predictive of Ab titers?
+> Q. Is RNA-Seq expression levels predictive of Ab titers?
 
-Yes, it's quite predictive. 
+Yes, it's quite predictive.
 
->Q. What differentiates aP vs. wP primed individuals?
+> Q. What differentiates aP vs. wP primed individuals?
 
-There are some differences between aP and wP individuals but we still not sure how to differentiate them. 
-
-
+There are some differences between aP and wP individuals but we still not sure how to differentiate them.
