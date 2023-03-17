@@ -1,7 +1,7 @@
 ---
 title: "BGGN213 Class 5 Data Visualization"
 author: "Wenxi Tang"
-format: pdf
+format: gfm
 editor: visual
 ---
 
@@ -42,9 +42,6 @@ ggplot(cars) +
   geom_smooth(method ="lm", se = FALSE)
 ```
 
-
-
-
 ## A plot of some gene expression data
 
 The code to read the data:
@@ -55,21 +52,21 @@ genes <- read.delim(url)
 head(genes)
 ```
 
->Q. Find out how many genes there are in this dataset.
+> Q. Find out how many genes there are in this dataset.
 
 ```{r}
 nrow(genes)
 ```
 
-There are `r nrow(genes)` genes in this dataset. 
+There are `r nrow(genes)` genes in this dataset.
 
->Q. How many genes are up-regulated?
+> Q. How many genes are up-regulated?
 
 ```{r}
 table(genes$State)
 ```
 
-Another way to do it: 
+Another way to do it:
 
 ```{r}
 sum(genes$State == "up")
@@ -93,6 +90,7 @@ p <- ggplot(genes) +
 p_colored <- p + scale_colour_manual(values = c("blue", "grey", "red"))
 p_colored
 ```
+
 Change the axis titles for the graph
 
 ```{r}
@@ -114,7 +112,7 @@ gapminder <- read.delim(url)
 head(gapminder)
 ```
 
->Q. How many countries are in this dataset?
+> Q. How many countries are in this dataset?
 
 ```{r}
 length(unique(gapminder$country))
@@ -122,13 +120,13 @@ length(unique(gapminder$country))
 
 There are `r length(unique(gapminder$country))` in this dataset.
 
->Q. How many years are spanned in this dataset?
+> Q. How many years are spanned in this dataset?
 
 ```{r}
 range(gapminder$year)
 ```
 
->Q. Which country has the smallest population?
+> Q. Which country has the smallest population?
 
 ```{r}
 min(gapminder$pop)
@@ -156,6 +154,7 @@ ggplot(gapminder) +
   geom_point(alpha = 0.5) +
   facet_wrap(~continent)
 ```
+
 ```{r}
 library(dplyr)
 gapminder_1957_2007 <- gapminder %>% filter (year == 1957 | year == 2007)
@@ -168,7 +167,6 @@ ggplot(gapminder_1957_2007) +
   geom_point(alpha = 0.5) +
   facet_wrap(~year)
 ```
-
 
 ```{r}
 ggplot(gapminder_1957_2007, aes(gdpPercap, lifeExp)) + geom_point()
