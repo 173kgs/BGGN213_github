@@ -1,7 +1,7 @@
 ---
 title: "Class12"
 author: "Wenxi Tang"
-format: pdf
+format: gfm
 editor: visual
 ---
 
@@ -365,10 +365,8 @@ attributes(gs)
 head(gs$less)
 ```
 
-
 ```{r}
 pathview(gene.data = foldchange, pathway.id = "hsa05310")
 ```
 
 ![](hsa05310.pathview.png)
-
