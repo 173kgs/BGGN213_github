@@ -1,0 +1,34 @@
+---
+title: "FindAGene"
+author: "Wenxi Tang"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(bio3d)
+```
+
+```{r}
+aln <- read.fasta("aln-clustalw.fst")
+```
+
+```{r}
+id <- seqidentity(aln, normalize=TRUE, similarity=FALSE, ncore=1, nseg.scale=1)
+```
+
+```{r}
+heatmap(id, margins = c(10,10))
+```
+
+```{r}
+protein <- blast.pdb("PRVRVQAGACRARPTWWGPQRLISGGRGDVEGMASSAVKYLSQEEAQAVDQELFNEYQFSVDQLMELAGLSCATAIAKAYPPTSLSRSPPTVLVICGPGNNGGDGLVCARHLKLFGYHPTIYYPKRPNKPLFTALVTQCQKMDIPFLDEMPSEPTLIDELYELVVDAIFGFSFKGEVREPFRSILSVLNGLTVPIASIDIPSGWDVERGNSGGIQPDLLISLTAPKKSAAQFTGRYHYLGGRFVPPALEKKYQLNLPPYPDTECVYRLQ")
+
+protein
+```
+
+
+```{r}
+read.pdb("2DG2")
+```
+
